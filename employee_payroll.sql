@@ -1,9 +1,6 @@
--- Step 1️⃣ Create and use the database
 DROP DATABASE IF EXISTS EmployeePayrollDB;
 CREATE DATABASE EmployeePayrollDB;
 USE EmployeePayrollDB;
-
--- Step 2️⃣ Create the tables
 
 CREATE TABLE Department (
     DeptID INT PRIMARY KEY AUTO_INCREMENT,
@@ -41,7 +38,6 @@ CREATE TABLE Payroll (
     FOREIGN KEY (EmpID) REFERENCES Employee(EmpID)
 );
 
--- Step 3️⃣ Insert sample data
 
 INSERT INTO Department (DeptName, Location)
 VALUES ('HR', 'Delhi'),
@@ -71,29 +67,21 @@ VALUES
 (3, 'November', 70000, 7000, 2000, 75000),
 (4, 'November', 80000, 8000, 1000, 87000);
 
--- ============================================
--- Step 4️⃣ Queries and Reports
--- ============================================
-
--- 🔹 1. Display all employees with department info (INNER JOIN)
 SELECT e.EmpName, e.Gender, d.DeptName, d.Location, e.Salary, e.Bonus
 FROM Employee e
 INNER JOIN Department d ON e.DeptID = d.DeptID;
 
--- 🔹 2. Find average salary by department (GROUP BY + JOIN)
 SELECT d.DeptName, ROUND(AVG(e.Salary),2) AS AvgSalary
 FROM Employee e
 JOIN Department d ON e.DeptID = d.DeptID
 GROUP BY d.DeptName
 ORDER BY AvgSalary DESC;
 
--- 🔹 3. List employees who were absent (JOIN + WHERE)
 SELECT e.EmpName, a.WorkDate, a.Status
 FROM Employee e
 JOIN Attendance a ON e.EmpID = a.EmpID
 WHERE a.Status = 'Absent';
 
--- 🔹 4. Calculate total payroll cost per department (JOIN + GROUP BY)
 SELECT d.DeptName, SUM(p.NetSalary) AS TotalDeptSalary
 FROM Payroll p
 JOIN Employee e ON p.EmpID = e.EmpID
@@ -101,18 +89,15 @@ JOIN Department d ON e.DeptID = d.DeptID
 GROUP BY d.DeptName
 ORDER BY TotalDeptSalary DESC;
 
--- 🔹 5. Employees earning above average salary (Subquery)
 SELECT EmpName, Salary
 FROM Employee
 WHERE Salary > (SELECT AVG(Salary) FROM Employee);
 
--- 🔹 6. Top 2 highest paid employees (ORDER BY + LIMIT)
 SELECT EmpName, Salary, Bonus
 FROM Employee
 ORDER BY Salary + Bonus DESC
 LIMIT 2;
 
--- 🔹 7. Department with most employees (Aggregation + Subquery)
 SELECT DeptName, COUNT(*) AS EmployeeCount
 FROM Department d
 JOIN Employee e ON d.DeptID = e.DeptID
@@ -120,7 +105,6 @@ GROUP BY DeptName
 ORDER BY EmployeeCount DESC
 LIMIT 1;
 
--- 🔹 8. View for HR dashboard (CREATE VIEW)
 CREATE OR REPLACE VIEW DepartmentSummary AS
 SELECT d.DeptName,
        COUNT(e.EmpID) AS TotalEmployees,
@@ -131,13 +115,10 @@ JOIN Employee e ON d.DeptID = e.DeptID
 JOIN Payroll p ON e.EmpID = p.EmpID
 GROUP BY d.DeptName;
 
--- Display the view
 SELECT * FROM DepartmentSummary;
 
--- 🔹 9. Salary Increment Example (UPDATE + Subquery)
 UPDATE Employee
 SET Salary = Salary * 1.05
 WHERE DeptID IN (SELECT DeptID FROM Department WHERE DeptName = 'IT');
 
--- 🔹 10. Verify update
 SELECT EmpName, DeptID, Salary FROM Employee WHERE DeptID = 2;
